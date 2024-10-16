@@ -1,8 +1,8 @@
-# Client Cache
+# Client Cache Query
 
 **English | [한국어](#클라이언트-캐시)**
 
-Client Cache is a React library that brings powerful caching mechanisms to client-side state management, inspired by React Query. It enables persistent local state across page reloads with features like TTL (Time To Live) and synchronization across tabs. The library is designed to be simple, efficient, and easy to integrate into your React applications.
+Client Cache Query is a React library that brings powerful caching mechanisms to client-side state management, inspired by React Query. It enables persistent local state across page reloads with features like TTL (Time To Live) and synchronization across tabs. The library is designed to be simple, efficient, and easy to integrate into your React applications.
 
 ## Features
 
@@ -165,11 +165,11 @@ This project is licensed under the MIT License.
 
 ---
 
-# 클라이언트 캐시
+# 클라이언트 캐시 쿼리
 
 **[English](#client-cache) | 한국어**
 
-클라이언트 캐시는 React Query에서 영감을 받아 클라이언트 측 상태 관리에 강력한 캐싱 메커니즘을 제공하는 React 라이브러리입니다. TTL(Time To Live) 및 탭 간 동기화와 같은 기능을 통해 페이지를 새로 고침하더라도 로컬 상태를 지속적으로 유지할 수 있도록 설계되었습니다. 사용하기 쉽고 효율적으로 React 애플리케이션에 통합할 수 있습니다.
+클라이언트 캐시 쿼리는 React Query에서 영감을 받아 클라이언트 측 상태 관리에 강력한 캐싱 메커니즘을 제공하는 React 라이브러리입니다. TTL(Time To Live) 및 탭 간 동기화와 같은 기능을 통해 페이지를 새로 고침하더라도 로컬 상태를 지속적으로 유지할 수 있도록 설계되었습니다. 사용하기 쉽고 효율적으로 React 애플리케이션에 통합할 수 있습니다.
 
 ## 주요 기능
 

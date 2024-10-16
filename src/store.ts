@@ -1,5 +1,7 @@
 "use client";
 
+import { StoredData } from "./types";
+
 type Listener = () => void;
 
 /**
@@ -14,9 +16,9 @@ export class ExternalStore<T> {
   /** 상태를 저장할 때 사용할 키입니다. */
   private key: string;
   /** 상태를 직렬화하는 함수입니다. */
-  private serialize: (value: any) => string;
+  private serialize: (value: StoredData<T>) => string;
   /** 상태를 역직렬화하는 함수입니다. */
-  private deserialize: (value: string) => any;
+  private deserialize: (value: string) => StoredData<T>;
   /** 상태의 초기 값입니다. */
   private initialValue: T;
   /** 상태의 TTL(Time To Live)로, 밀리초(ms) 단위입니다. */

@@ -29,3 +29,13 @@ export type UseClientCacheOptions<T> = {
    */
   namespace?: string;
 };
+
+/**
+ * 저장할 데이터에 대한 타입입니다.
+ */
+export type StoredData<T> = {
+  /** 저장할 데이터 타입 */
+  value: T;
+  /** 만료 시간 */
+  expiry: number | null;
+};

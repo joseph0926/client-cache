@@ -1,18 +1,23 @@
 "use client";
 
-import { useEffect, useRef, useSyncExternalStore } from "react";
+import {
+  useEffect,
+  useRef,
+  useSyncExternalStore,
+  type SetStateAction,
+} from "react";
 import { UseClientCacheOptions } from "./types";
 import { createExternalStore, ExternalStore } from "./store";
 
 type UseClientCacheReturn<T> = [T, (value: T) => void];
 
 /**
- * Custom hook to persist and synchronize client state using localStorage and useSyncExternalStore.
- * @template T Type of the stored state.
- * @param key Unique key for the state value.
- * @param initialValue Initial value of the state.
- * @param options Optional configurations.
- * @returns A tuple containing the state and a setter function.
+ * localStorage 및 useSyncExternalStore를 사용하여 클라이언트 상태를 유지하고 동기화하는 커스텀 훅입니다.
+ * @template T 저장된 상태의 타입입니다.
+ * @param key 상태 값의 고유 키입니다.
+ * @param initialValue 초기 값입니다.
+ * @param options 선택적 구성입니다.
+ * @returns state & setState
  */
 function useClientCache<T>(
   key: string,
@@ -27,7 +32,7 @@ function useClientCache<T>(
     namespace = "client-cache",
   } = options;
 
-  const namespacedKey = `${namespace}:${key}`;
+  const namespacedKey = `${namespace}:${encodeURIComponent(key)}`;
 
   /** External store ref */
   const storeRef = useRef<ExternalStore<T> | null>(null);
@@ -56,18 +61,23 @@ function useClientCache<T>(
 
   const state = useSyncExternalStore(
     (listener) => store.subscribe(listener),
-    () => store.getSnapshot()
+    () => store.getSnapshot(),
+    () => initialValue
   );
 
-  const setState = (value: T) => {
-    store.setState(value);
+  const setState = (action: SetStateAction<T>) => {
+    if (typeof action === "function") {
+      store.setState((action as (prevState: T) => T)(store.getSnapshot()));
+    } else {
+      store.setState(action);
+    }
   };
 
   useEffect(() => {
     return () => {
       store.cleanup();
     };
-  }, [store]);
+  }, []);
 
   return [state, setState];
 }

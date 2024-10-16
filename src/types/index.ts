@@ -12,12 +12,12 @@ export type UseClientCacheOptions<T> = {
    * 상태를 직렬화하는 함수입니다.
    * 기본값은 `JSON.stringify`입니다.
    */
-  serialize?: (value: any) => string;
+  serialize?: (value: StoredData<T>) => string;
   /**
    * 상태를 역직렬화하는 함수입니다.
    * 기본값은 `JSON.parse`입니다.
    */
-  deserialize?: (value: string) => any;
+  deserialize?: (value: string) => StoredData<T>;
   /**
    * 상태의 TTL(Time To Live)로, 밀리초(ms) 단위입니다.
    * 설정하지 않으면 만료되지 않습니다.

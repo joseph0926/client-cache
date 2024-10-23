@@ -1,75 +1,84 @@
-"use client";
-
 import {
+  type SetStateAction,
   useEffect,
   useRef,
   useSyncExternalStore,
-  type SetStateAction,
 } from "react";
-import { UseClientCacheOptions } from "./types";
-import { createExternalStore, ExternalStore } from "./store";
-
-type UseClientCacheReturn<T> = [T, (value: T) => void];
+import { ExternalStore } from "./store";
+import type { UseClientCacheOptions } from "./types";
 
 /**
- * localStorage 및 useSyncExternalStore를 사용하여 클라이언트 상태를 유지하고 동기화하는 커스텀 훅입니다.
- * @template T 저장된 상태의 타입입니다.
- * @param key 상태 값의 고유 키입니다.
- * @param initialValue 초기 값입니다.
- * @param options 선택적 구성입니다.
- * @returns state & setState
+ * 클라이언트 상태를 캐시하고 관리하는 React 훅입니다.
+ * @template T 저장할 상태의 타입
+ * @param key 상태를 식별하는 고유 키
+ * @param initialValue 초기값
+ * @param options 캐시 옵션
+ * @returns [현재 상태, 상태 업데이트 함수]
  */
-function useClientCache<T>(
+export function useClientCache<T>(
   key: string,
   initialValue: T,
   options: UseClientCacheOptions<T> = {}
-): UseClientCacheReturn<T> {
+): [T, (value: T | ((prev: T) => T)) => Promise<void>] {
   const {
     storage = typeof window !== "undefined" ? window.localStorage : undefined,
     serialize = JSON.stringify,
     deserialize = JSON.parse,
     ttl,
     namespace = "client-cache",
+    onError = console.error,
+    validateOnLoad = true,
+    compression = false,
+    encryptionKey,
+    maxSize = 5 * 1024 * 1024,
+    staleWhileRevalidate = 0,
   } = options;
 
   const namespacedKey = `${namespace}:${encodeURIComponent(key)}`;
-
-  /** External store ref */
   const storeRef = useRef<ExternalStore<T> | null>(null);
 
   if (!storeRef.current) {
-    /** 외부 store에 접근 불가능하면 인메모리에 상태를 저장합니다 */
     if (!storage) {
       console.warn(
         "Storage is not available. Falling back to in-memory storage."
       );
-      return [initialValue, () => {}];
+      return [initialValue, async () => {}];
     }
 
-    storeRef.current = createExternalStore<T>({
+    storeRef.current = new ExternalStore<T>({
       storage,
       key: namespacedKey,
       serialize,
       deserialize,
       initialValue,
       ttl,
+      onError,
+      validateOnLoad,
+      compression,
+      encryptionKey,
+      maxSize,
+      staleWhileRevalidate,
     });
   }
 
-  /** External store */
   const store = storeRef.current;
 
   const state = useSyncExternalStore(
-    (listener) => store.subscribe(listener),
-    () => store.getSnapshot(),
-    () => initialValue
+    store.subscribe.bind(store),
+    store.getSnapshot.bind(store),
+    store.getServerSnapshot.bind(store)
   );
 
-  const setState = (action: SetStateAction<T>) => {
-    if (typeof action === "function") {
-      store.setState((action as (prevState: T) => T)(store.getSnapshot()));
-    } else {
-      store.setState(action);
+  const setState = async (action: T | ((prev: T) => T)): Promise<void> => {
+    try {
+      const newValue =
+        typeof action === "function"
+          ? (action as (prev: T) => T)(store.getSnapshot())
+          : action;
+
+      await store.setState(newValue);
+    } catch (error) {
+      onError(new Error(`Failed to set state: ${error}`));
     }
   };
 
@@ -81,5 +90,3 @@ function useClientCache<T>(
 
   return [state, setState];
 }
-
-export { useClientCache };

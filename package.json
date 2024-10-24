@@ -1,6 +1,6 @@
 {
   "name": "client-cache-query",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "client-cache is a React library that applies React Query's powerful caching mechanism to client-side state management. It enables persistent local state across page reloads",
   "main": "dist/index.js",
   "files": [
